@@ -18,5 +18,5 @@
 	<assets path="assets/audio" rename="audio" include="*.wav|*.ogg" unless="flash" />
 	<assets path="assets/font" rename="font" include="*.ttf" />
 
-	<icon path="assets/HaxePunk.svg" />
+	<icon path="assets/logo.svg" />
 </project>
