@@ -1,3 +1,6 @@
+project.xml.hxml
+assets/font/04B_03__.eot
+
 bin/
 assets/font/*.hash
 .DS_Store
