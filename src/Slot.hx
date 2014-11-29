@@ -26,20 +26,36 @@ class Slot extends Entity
         full.scale = scale;
     }
 
+    #if mobile
     private function handleTouch(touch:Touch) {
         var touchEntity = new Entity(touch.x, touch.y);
-        if (this.collideWith(touchEntity, this.x, this.y) == touchEntity) {
+        if (this.collideWith(touchEntity, this.x, this.y) == touchEntity &&
+            touch.pressed) {
             this.filled = !this.filled;
         }
     }
+    #end
 
+    #if !mobile
+    private function handleMouse () {
+        var mouseEntity = new Entity(Input.mouseX, Input.mouseY);
+        if (this.collideWith(mouseEntity, this.x, this.y) == mouseEntity) {
+            this.filled = !this.filled;
+        }
+    }
+    #end
 
 
     public override function update() {
         super.update();
 
+    #if mobile
         Input.touchPoints(handleTouch);
-        
+    #else
+        if (Input.mousePressed) {
+            handleMouse();
+        }
+    #end
         if (filled) {
             this.graphic = full;
         } else {
