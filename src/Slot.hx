@@ -10,6 +10,7 @@ class Slot extends Entity
 
     private var empty:Image;
     private var full:Image;
+    private var main:MainScene;
     
     public function new (x, y) {
         super(x, y);
@@ -24,6 +25,7 @@ class Slot extends Entity
         super.added();
         empty.scale = scale;
         full.scale = scale;
+        main = cast(this.scene, MainScene);
     }
 
     #if mobile
@@ -32,6 +34,7 @@ class Slot extends Entity
         if (this.collideWith(touchEntity, this.x, this.y) == touchEntity &&
             touch.pressed) {
             this.filled = !this.filled;
+            main.fillOrEmpty(this.filled);
         }
     }
     #end
@@ -41,10 +44,10 @@ class Slot extends Entity
         var mouseEntity = new Entity(Input.mouseX, Input.mouseY);
         if (this.collideWith(mouseEntity, this.x, this.y) == mouseEntity) {
             this.filled = !this.filled;
+            main.fillOrEmpty(this.filled);
         }
     }
     #end
-
 
     public override function update() {
         super.update();
