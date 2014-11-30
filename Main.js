@@ -4912,12 +4912,12 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 	}
 	,update: function() {
 		com_haxepunk_Scene.prototype.update.call(this);
-		if(!this.done) this.shouldSteal();
+		if(!this.done) this.shouldSteal(); else this.doneTime += com_haxepunk_HXP.elapsed;
+		if(this.doneTime > 3) com_haxepunk_HXP.set_scene(new IntroScene());
 		this.soupBar.set_scaledWidth(this.cansOfSoup / 40 * 100 * this.scale | 0);
 		if(this.time > 0) this.time -= com_haxepunk_HXP.elapsed; else this.time = 0;
 		this.timeText.set_text(Std.string(Math.round(this.time * 100) / 100.0));
 		if(this.time <= 0 && !this.done) {
-			this.doneTime += com_haxepunk_HXP.elapsed;
 			if(this.cansOfSoup == 40) {
 				this.done = true;
 				var wonText = new com_haxepunk_graphics_Text("Well Done",null,null,null,null,{ color : 218103807});
@@ -4952,7 +4952,6 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 				wonText1._scale = this.scale;
 				this.addGraphic(wonText1,null,20 * this.scale,com_haxepunk_HXP.screen.height / 2);
 			}
-			if(this.doneTime > 3) com_haxepunk_HXP.set_scene(new IntroScene());
 		}
 	}
 	,__class__: MainScene
