@@ -107,6 +107,9 @@ class MainScene extends Scene
             shouldSteal();
         }
 
+        if (doneTime > 3) {
+            HXP.scene = new IntroScene();
+        }
         soupBar.scaledWidth = Std.int(cansOfSoup / 40 * 100 * scale);
         if (time > 0) {
             time -= HXP.elapsed;
@@ -138,9 +141,6 @@ class MainScene extends Scene
                 wonText.size = Std.int(40 * scale);
                 wonText.scale = scale;
                 addGraphic(wonText, 20 * scale, HXP.screen.height / 2);
-            }
-            if (doneTime > 3) {
-                HXP.scene = new IntroScene();
             }
         }
     }
