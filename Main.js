@@ -45,7 +45,13 @@ ApplicationMain.create = function() {
 	types.push("FONT");
 	urls.push("font/04B_03__.ttf.png");
 	types.push("IMAGE");
+	urls.push("graphics/sunsetbg.png");
+	types.push("IMAGE");
+	urls.push("graphics/hoover.png");
+	types.push("IMAGE");
 	urls.push("graphics/full.png");
+	types.push("IMAGE");
+	urls.push("graphics/man.png");
 	types.push("IMAGE");
 	urls.push("graphics/empty.png");
 	types.push("IMAGE");
@@ -1236,7 +1242,7 @@ Main.main = function() {
 Main.__super__ = com_haxepunk_Engine;
 Main.prototype = $extend(com_haxepunk_Engine.prototype,{
 	init: function() {
-		com_haxepunk_HXP.set_scene(new MainScene());
+		com_haxepunk_HXP.set_scene(new IntroScene());
 	}
 	,__class__: Main
 });
@@ -1347,7 +1353,16 @@ var DefaultAssetLibrary = function() {
 	id = "font/04B_03__.ttf.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
+	id = "graphics/sunsetbg.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
+	id = "graphics/hoover.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
 	id = "graphics/full.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
+	id = "graphics/man.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
 	id = "graphics/empty.png";
@@ -1612,71 +1627,6 @@ HxOverrides.iter = function(a) {
 	}, next : function() {
 		return this.arr[this.cur++];
 	}};
-};
-var List = function() {
-	this.length = 0;
-};
-$hxClasses["List"] = List;
-List.__name__ = ["List"];
-List.prototype = {
-	h: null
-	,q: null
-	,length: null
-	,add: function(item) {
-		var x = [item];
-		if(this.h == null) this.h = x; else this.q[1] = x;
-		this.q = x;
-		this.length++;
-	}
-	,push: function(item) {
-		var x = [item,this.h];
-		this.h = x;
-		if(this.q == null) this.q = x;
-		this.length++;
-	}
-	,first: function() {
-		if(this.h == null) return null; else return this.h[0];
-	}
-	,last: function() {
-		if(this.q == null) return null; else return this.q[0];
-	}
-	,pop: function() {
-		if(this.h == null) return null;
-		var x = this.h[0];
-		this.h = this.h[1];
-		if(this.h == null) this.q = null;
-		this.length--;
-		return x;
-	}
-	,isEmpty: function() {
-		return this.h == null;
-	}
-	,remove: function(v) {
-		var prev = null;
-		var l = this.h;
-		while(l != null) {
-			if(l[0] == v) {
-				if(prev == null) this.h = l[1]; else prev[1] = l[1];
-				if(this.q == l) this.q = prev;
-				this.length--;
-				return true;
-			}
-			prev = l;
-			l = l[1];
-		}
-		return false;
-	}
-	,iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
-	}
-	,__class__: List
 };
 var com_haxepunk_Tweener = function() {
 	this.active = true;
@@ -2414,6 +2364,134 @@ com_haxepunk_Scene.prototype = $extend(com_haxepunk_Tweener.prototype,{
 	,__class__: com_haxepunk_Scene
 	,__properties__: $extend(com_haxepunk_Tweener.prototype.__properties__,{get_uniqueTypes:"get_uniqueTypes",get_layerNearest:"get_layerNearest",get_layerFarthest:"get_layerFarthest",get_nearest:"get_nearest",get_farthest:"get_farthest",get_layers:"get_layers",get_first:"get_first",get_count:"get_count",get_mouseY:"get_mouseY",get_mouseX:"get_mouseX"})
 });
+var IntroScene = function() {
+	com_haxepunk_Scene.call(this);
+};
+$hxClasses["IntroScene"] = IntroScene;
+IntroScene.__name__ = ["IntroScene"];
+IntroScene.__super__ = com_haxepunk_Scene;
+IntroScene.prototype = $extend(com_haxepunk_Scene.prototype,{
+	time: null
+	,begin: function() {
+		com_haxepunk_Scene.prototype.begin.call(this);
+		this.time = 0.0;
+		var scale = com_haxepunk_HXP.screen.width / 640;
+		var bg = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+			var $r;
+			var e = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
+				var $r;
+				var data = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("graphics/sunsetbg.png",true);
+				$r = data;
+				return $r;
+			}($this))));
+			$r = e;
+			return $r;
+		}(this)):(function($this) {
+			var $r;
+			var e1 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("graphics/sunsetbg.png"));
+			$r = e1;
+			return $r;
+		}(this)));
+		bg._scale = scale;
+		this.addGraphic(bg);
+		var jean = new com_haxepunk_graphics_Spritemap(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+			var $r;
+			var e2 = com_haxepunk_ds_Either.Right(new com_haxepunk_graphics_atlas_TileAtlas((function($this) {
+				var $r;
+				var data1 = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("graphics/man.png",true);
+				$r = data1;
+				return $r;
+			}($this))));
+			$r = e2;
+			return $r;
+		}(this)):(function($this) {
+			var $r;
+			var e3 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("graphics/man.png"));
+			$r = e3;
+			return $r;
+		}(this)),48,56);
+		jean._scale = scale * 3;
+		jean.smooth = false;
+		jean.add("walking",[0,1,2,3],12);
+		jean.play("walking");
+		this.addGraphic(jean,null,40 * scale,320 * scale);
+		var kombatText = new com_haxepunk_graphics_Text("iasdfsdaf",null,null,null,null,{ color : 218103807});
+		kombatText.set_size(16 * scale | 0);
+		kombatText._scale = scale;
+		this.addGraphic(kombatText,null,400 * scale,120 * scale);
+	}
+	,update: function() {
+		com_haxepunk_Scene.prototype.update.call(this);
+		this.time += com_haxepunk_HXP.elapsed;
+		if(this.time > 3) com_haxepunk_HXP.set_scene(new MainScene());
+	}
+	,__class__: IntroScene
+});
+var List = function() {
+	this.length = 0;
+};
+$hxClasses["List"] = List;
+List.__name__ = ["List"];
+List.prototype = {
+	h: null
+	,q: null
+	,length: null
+	,add: function(item) {
+		var x = [item];
+		if(this.h == null) this.h = x; else this.q[1] = x;
+		this.q = x;
+		this.length++;
+	}
+	,push: function(item) {
+		var x = [item,this.h];
+		this.h = x;
+		if(this.q == null) this.q = x;
+		this.length++;
+	}
+	,first: function() {
+		if(this.h == null) return null; else return this.h[0];
+	}
+	,last: function() {
+		if(this.q == null) return null; else return this.q[0];
+	}
+	,pop: function() {
+		if(this.h == null) return null;
+		var x = this.h[0];
+		this.h = this.h[1];
+		if(this.h == null) this.q = null;
+		this.length--;
+		return x;
+	}
+	,isEmpty: function() {
+		return this.h == null;
+	}
+	,remove: function(v) {
+		var prev = null;
+		var l = this.h;
+		while(l != null) {
+			if(l[0] == v) {
+				if(prev == null) this.h = l[1]; else prev[1] = l[1];
+				if(this.q == l) this.q = prev;
+				this.length--;
+				return true;
+			}
+			prev = l;
+			l = l[1];
+		}
+		return false;
+	}
+	,iterator: function() {
+		return { h : this.h, hasNext : function() {
+			return this.h != null;
+		}, next : function() {
+			if(this.h == null) return null;
+			var x = this.h[0];
+			this.h = this.h[1];
+			return x;
+		}};
+	}
+	,__class__: List
+};
 var MainScene = function() {
 	this.time = 20;
 	com_haxepunk_Scene.call(this);
@@ -6356,6 +6434,38 @@ com_haxepunk_debug_LayerList.prototype = $extend(openfl_display_Sprite.prototype
 var com_haxepunk_ds_Either = $hxClasses["com.haxepunk.ds.Either"] = { __ename__ : true, __constructs__ : ["Left","Right"] };
 com_haxepunk_ds_Either.Left = function(v) { var $x = ["Left",0,v]; $x.__enum__ = com_haxepunk_ds_Either; $x.toString = $estr; return $x; };
 com_haxepunk_ds_Either.Right = function(v) { var $x = ["Right",1,v]; $x.__enum__ = com_haxepunk_ds_Either; $x.toString = $estr; return $x; };
+var com_haxepunk_graphics_Animation = function(name,frames,frameRate,loop,parent) {
+	if(loop == null) loop = true;
+	if(frameRate == null) frameRate = 0;
+	this.name = name;
+	this.frames = frames;
+	if(frameRate == 0) this.frameRate = com_haxepunk_HXP.assignedFrameRate; else this.frameRate = frameRate;
+	this.loop = loop;
+	this.frameCount = frames.length;
+	this.set_parent(parent);
+};
+$hxClasses["com.haxepunk.graphics.Animation"] = com_haxepunk_graphics_Animation;
+com_haxepunk_graphics_Animation.__name__ = ["com","haxepunk","graphics","Animation"];
+com_haxepunk_graphics_Animation.prototype = {
+	play: function(reset,reverse) {
+		if(reverse == null) reverse = false;
+		if(reset == null) reset = false;
+		if(this.name == null) this._parent.playAnimation(this,reset,reverse); else this._parent.play(this.name,reset,reverse);
+	}
+	,parent: null
+	,set_parent: function(value) {
+		this._parent = value;
+		return this._parent;
+	}
+	,name: null
+	,frames: null
+	,frameRate: null
+	,frameCount: null
+	,loop: null
+	,_parent: null
+	,__class__: com_haxepunk_graphics_Animation
+	,__properties__: {set_parent:"set_parent"}
+};
 var com_haxepunk_graphics_Graphiclist = function(graphic) {
 	this._graphics = new Array();
 	this._temp = new Array();
@@ -6901,6 +7011,263 @@ com_haxepunk_graphics_Image.prototype = $extend(com_haxepunk_Graphic.prototype,{
 	,_scale: null
 	,__class__: com_haxepunk_graphics_Image
 	,__properties__: $extend(com_haxepunk_Graphic.prototype.__properties__,{get_clipRect:"get_clipRect",set_scaledHeight:"set_scaledHeight",get_scaledHeight:"get_scaledHeight",set_scaledWidth:"set_scaledWidth",get_scaledWidth:"get_scaledWidth",get_height:"get_height",get_width:"get_width",set_flipped:"set_flipped",get_flipped:"get_flipped",set_color:"set_color",get_color:"get_color",set_alpha:"set_alpha",get_alpha:"get_alpha",set_scale:"set_scale",get_scale:"get_scale"})
+});
+var com_haxepunk_graphics_Spritemap = function(source,frameWidth,frameHeight,cbFunc) {
+	if(frameHeight == null) frameHeight = 0;
+	if(frameWidth == null) frameWidth = 0;
+	this.complete = true;
+	this.rate = 1;
+	this._anims = new haxe_ds_StringMap();
+	this._timer = this._frame = 0;
+	this._rect = new openfl_geom_Rectangle(0,0,frameWidth,frameHeight);
+	{
+		var _g = source;
+		switch(_g[1]) {
+		case 0:
+			var bd = _g[2];
+			com_haxepunk_graphics_Image.call(this,com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+				var $r;
+				var e = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
+					var $r;
+					var data = new com_haxepunk_graphics_atlas_AtlasData(bd);
+					$r = data;
+					return $r;
+				}($this))));
+				$r = e;
+				return $r;
+			}(this)):(function($this) {
+				var $r;
+				var e1 = com_haxepunk_ds_Either.Left(bd);
+				$r = e1;
+				return $r;
+			}(this)),this._rect);
+			break;
+		case 1:
+			var atlas = _g[2];
+			this._atlas = atlas;
+			this._atlas.prepare(frameWidth,frameHeight);
+			com_haxepunk_graphics_Image.call(this,(function($this) {
+				var $r;
+				var region = atlas.getRegion($this._frame);
+				$r = (function($this) {
+					var $r;
+					var e2 = com_haxepunk_ds_Either.Right(region);
+					$r = e2;
+					return $r;
+				}($this));
+				return $r;
+			}(this)),this._rect);
+			break;
+		}
+	}
+	if(this.blit) {
+		this._width = this._source.width;
+		this._height = this._source.height;
+	} else {
+		this._width = Std["int"](this._atlas.get_width());
+		this._height = Std["int"](this._atlas.get_height());
+	}
+	if(frameWidth == 0) this._rect.width = this._width;
+	if(frameHeight == 0) this._rect.height = this._height;
+	if(this._width % this._rect.width != 0 || this._height % this._rect.height != 0) throw "Source image width and height should be multiples of the frame width and height.";
+	this._columns = Math.ceil(this._width / this._rect.width);
+	this._rows = Math.ceil(this._height / this._rect.height);
+	this._frameCount = this._columns * this._rows;
+	this.callbackFunc = cbFunc;
+	this.updateBuffer();
+	this.active = true;
+};
+$hxClasses["com.haxepunk.graphics.Spritemap"] = com_haxepunk_graphics_Spritemap;
+com_haxepunk_graphics_Spritemap.__name__ = ["com","haxepunk","graphics","Spritemap"];
+com_haxepunk_graphics_Spritemap.__super__ = com_haxepunk_graphics_Image;
+com_haxepunk_graphics_Spritemap.prototype = $extend(com_haxepunk_graphics_Image.prototype,{
+	complete: null
+	,callbackFunc: null
+	,rate: null
+	,updateBuffer: function(clearBefore) {
+		if(clearBefore == null) clearBefore = false;
+		if(this.blit) {
+			if(this._width > 0 && this._height > 0) {
+				this._rect.x = this._rect.width * this._frame;
+				this._rect.y = (this._rect.x / this._width | 0) * this._rect.height;
+				this._rect.x = this._rect.x % this._width;
+				if(this._flipped) this._rect.x = this._width - this._rect.width - this._rect.x;
+			}
+			com_haxepunk_graphics_Image.prototype.updateBuffer.call(this,clearBefore);
+		} else this._region = this._atlas.getRegion(this._frame);
+	}
+	,update: function() {
+		if(this._anim != null && !this.complete) {
+			this._timer += (com_haxepunk_HXP.fixed?this._anim.frameRate / com_haxepunk_HXP.assignedFrameRate:this._anim.frameRate * com_haxepunk_HXP.elapsed) * this.rate;
+			if(this._timer >= 1) {
+				while(this._timer >= 1) {
+					this._timer--;
+					if(this.reverse) this._index += -1; else this._index += 1;
+					if(this.reverse && this._index == -1 || !this.reverse && this._index == this._anim.frameCount) {
+						if(this._anim.loop) {
+							if(this.reverse) this._index = this._anim.frameCount - 1; else this._index = 0;
+							if(this.callbackFunc != null) this.callbackFunc();
+						} else {
+							if(this.reverse) this._index = 0; else this._index = this._anim.frameCount - 1;
+							this.complete = true;
+							if(this.callbackFunc != null) this.callbackFunc();
+							break;
+						}
+					}
+				}
+				if(this._anim != null) this._frame = this._anim.frames[this._index] | 0;
+				this.updateBuffer();
+			}
+		}
+	}
+	,add: function(name,frames,frameRate,loop) {
+		if(loop == null) loop = true;
+		if(frameRate == null) frameRate = 0;
+		if(this._anims.get(name) != null) throw "Cannot have multiple animations with the same name";
+		var _g1 = 0;
+		var _g = frames.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			frames[i] %= this._frameCount;
+			if(frames[i] < 0) frames[i] += this._frameCount;
+		}
+		var anim = new com_haxepunk_graphics_Animation(name,frames,frameRate,loop);
+		this._anims.set(name,anim);
+		anim.set_parent(this);
+		return anim;
+	}
+	,play: function(name,reset,reverse) {
+		if(reverse == null) reverse = false;
+		if(reset == null) reset = false;
+		if(name == null) name = "";
+		if(!reset && this._anim != null && this._anim.name == name) return this._anim;
+		if(!this._anims.exists(name)) {
+			this.stop(reset);
+			return null;
+		}
+		this._anim = this._anims.get(name);
+		this.reverse = reverse;
+		this.restart();
+		return this._anim;
+	}
+	,playFrames: function(frames,frameRate,loop,reset,reverse) {
+		if(reverse == null) reverse = false;
+		if(reset == null) reset = false;
+		if(loop == null) loop = true;
+		if(frameRate == null) frameRate = 0;
+		if(frames == null || frames.length == 0) {
+			this.stop(reset);
+			return null;
+		}
+		if(reset == false && this._anim != null && this._anim.frames == frames) return this._anim;
+		return this.playAnimation(new com_haxepunk_graphics_Animation(null,frames,frameRate,loop),reset,reverse);
+	}
+	,playAnimation: function(anim,reset,reverse) {
+		if(reverse == null) reverse = false;
+		if(reset == null) reset = false;
+		if(anim == null) throw "No animation supplied";
+		if(reset == false && this._anim == anim) return anim;
+		this._anim = anim;
+		this.reverse = reverse;
+		this.restart();
+		return anim;
+	}
+	,restart: function() {
+		this._timer = this.reverse?this._index = this._anim.frames.length - 1:this._index = 0;
+		this._frame = this._anim.frames[this._index];
+		this.complete = false;
+		this.updateBuffer();
+	}
+	,stop: function(reset) {
+		if(reset == null) reset = false;
+		this._anim = null;
+		if(reset) this._frame = this.reverse?this._index = this._anim.frames.length - 1:this._index = 0;
+		this.complete = true;
+		this.updateBuffer();
+	}
+	,getFrame: function(column,row) {
+		if(row == null) row = 0;
+		if(column == null) column = 0;
+		return row % this._rows * this._columns + column % this._columns;
+	}
+	,setFrame: function(column,row) {
+		if(row == null) row = 0;
+		if(column == null) column = 0;
+		this._anim = null;
+		var frame = row % this._rows * this._columns + column % this._columns;
+		if(this._frame == frame) return;
+		this._frame = frame;
+		this.updateBuffer();
+	}
+	,randFrame: function() {
+		this.set_frame((function($this) {
+			var $r;
+			com_haxepunk_HXP._seed = com_haxepunk_HXP._seed * 16807.0 % 2147483647 | 0;
+			$r = com_haxepunk_HXP._seed / 2147483647 * $this._frameCount | 0;
+			return $r;
+		}(this)));
+	}
+	,setAnimFrame: function(name,index) {
+		var frames = this._anims.get(name).frames;
+		index = index % frames.length;
+		if(index < 0) index += frames.length;
+		this.set_frame(frames[index]);
+	}
+	,get_frame: function() {
+		return this._frame;
+	}
+	,set_frame: function(value) {
+		this._anim = null;
+		value %= this._frameCount;
+		if(value < 0) value = this._frameCount + value;
+		if(this._frame == value) return this._frame;
+		this._frame = value;
+		this.updateBuffer();
+		return this._frame;
+	}
+	,get_index: function() {
+		if(this._anim != null) return this._index; else return 0;
+	}
+	,set_index: function(value) {
+		if(this._anim == null) return 0;
+		value %= this._anim.frameCount;
+		if(this._index == value) return this._index;
+		this._index = value;
+		this._frame = this._anim.frames[this._index];
+		this.updateBuffer();
+		return this._index;
+	}
+	,reverse: null
+	,frameCount: null
+	,get_frameCount: function() {
+		return this._frameCount;
+	}
+	,columns: null
+	,get_columns: function() {
+		return this._columns;
+	}
+	,rows: null
+	,get_rows: function() {
+		return this._rows;
+	}
+	,currentAnim: null
+	,get_currentAnim: function() {
+		if(this._anim != null) return this._anim.name; else return "";
+	}
+	,_rect: null
+	,_width: null
+	,_height: null
+	,_columns: null
+	,_rows: null
+	,_frameCount: null
+	,_anims: null
+	,_anim: null
+	,_index: null
+	,_frame: null
+	,_timer: null
+	,_atlas: null
+	,__class__: com_haxepunk_graphics_Spritemap
+	,__properties__: $extend(com_haxepunk_graphics_Image.prototype.__properties__,{get_currentAnim:"get_currentAnim",get_rows:"get_rows",get_columns:"get_columns",get_frameCount:"get_frameCount",set_index:"set_index",get_index:"get_index",set_frame:"set_frame",get_frame:"get_frame"})
 });
 var com_haxepunk_graphics__$Text_StyleType_$Impl_$ = function() { };
 $hxClasses["com.haxepunk.graphics._Text.StyleType_Impl_"] = com_haxepunk_graphics__$Text_StyleType_$Impl_$;
