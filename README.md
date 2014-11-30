@@ -7,8 +7,8 @@ If you don't like the art, make new ones and e-mail me or on [twitter: @fritzvd]
 
 Build yourself with HaxePunk and Openfl. Or download pre-made builds:
 * [Android](https://play.google.com/store/apps/details?id=com.fritzvd.theflood)
-* [Windows](https://github.com/fritzvd/theflood/archive/0.1.2-win.zip)
-* [Linux](https://github.com/fritzvd/theflood/archive/0.1.2-lin64.zip)
+* [Windows](https://github.com/fritzvd/theflood/archive/0.1.4-win.zip)
+* [Linux](https://github.com/fritzvd/theflood/archive/0.1.3-lin64.zip)
 * [Mac](https://github.com/fritzvd/theflood/releases/tag/0.1.2-mac64)
 
 There is also an okay-ish html5 build, but the letters are wonky:
