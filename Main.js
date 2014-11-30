@@ -57,6 +57,10 @@ ApplicationMain.create = function() {
 	types.push("IMAGE");
 	urls.push("graphics/empty.png");
 	types.push("IMAGE");
+	urls.push("audio/geethanks.wav");
+	types.push("SOUND");
+	urls.push("audio/stack.wav");
+	types.push("SOUND");
 	urls.push("font/04B_03__.ttf");
 	types.push("FONT");
 	ApplicationMain.preloader.load(urls,types);
@@ -1234,7 +1238,12 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 	,__properties__: $extend(openfl_display_Sprite.prototype.__properties__,{set_scene:"set_scene",get_scene:"get_scene"})
 });
 var Main = function(width,height,frameRate,fixed,renderMode) {
-	com_haxepunk_Engine.call(this,width,height,frameRate,fixed,renderMode);
+	if(fixed == null) fixed = false;
+	if(frameRate == null) frameRate = 60;
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	this.done = false;
+	com_haxepunk_Engine.call(this,640,480,frameRate,fixed,renderMode);
 };
 $hxClasses["Main"] = Main;
 Main.__name__ = ["Main"];
@@ -1243,7 +1252,8 @@ Main.main = function() {
 };
 Main.__super__ = com_haxepunk_Engine;
 Main.prototype = $extend(com_haxepunk_Engine.prototype,{
-	init: function() {
+	done: null
+	,init: function() {
 		com_haxepunk_HXP.set_scene(new IntroScene());
 	}
 	,__class__: Main
@@ -1373,6 +1383,12 @@ var DefaultAssetLibrary = function() {
 	id = "graphics/empty.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
+	id = "audio/geethanks.wav";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
+	id = "audio/stack.wav";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
 	id = "font/04B_03__.ttf";
 	this.className.set(id,_$_$ASSET_$_$font_$5);
 	this.type.set(id,"FONT");
@@ -4801,6 +4817,7 @@ List.prototype = {
 };
 var MainScene = function() {
 	this.cansOfSoup = 0;
+	this.doneTime = 0;
 	this.time = 20;
 	com_haxepunk_Scene.call(this);
 };
@@ -4809,14 +4826,19 @@ MainScene.__name__ = ["MainScene"];
 MainScene.__super__ = com_haxepunk_Scene;
 MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 	time: null
+	,doneTime: null
 	,cupboard: null
 	,scale: null
 	,xOff: null
 	,yOff: null
 	,timeText: null
 	,soupBar: null
+	,geethanks: null
+	,stack: null
+	,done: null
 	,cansOfSoup: null
 	,begin: function() {
+		this.done = (js_Boot.__cast(com_haxepunk_HXP.engine , Main)).done;
 		com_haxepunk_Scene.prototype.begin.call(this);
 		this.scale = com_haxepunk_HXP.screen.width / 640;
 		this.xOff = com_haxepunk_HXP.screen.width / 10;
@@ -4828,13 +4850,18 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 		this.timeText._scale = this.scale;
 		this.timeText.set_text(Std.string(this.time));
 		this.addGraphic(this.timeText,null,com_haxepunk_HXP.screen.width / 2 - 8 * this.scale,20 * this.scale);
-		var outerSoupBar = com_haxepunk_graphics_Image.createRect(106,26,14540253);
-		this.soupBar = com_haxepunk_graphics_Image.createRect(100,20,12797224);
+		var outerSoupBar = com_haxepunk_graphics_Image.createRect(106 * this.scale | 0,this.scale * 26 | 0,14540253);
+		this.soupBar = com_haxepunk_graphics_Image.createRect(100 * this.scale | 0,20 * this.scale | 0,12797224);
 		this.addGraphic(outerSoupBar,null,10 * this.scale,10 * this.scale);
 		this.addGraphic(this.soupBar,null,13 * this.scale,13 * this.scale);
+		this.geethanks = new com_haxepunk_Sfx("audio/geethanks.wav");
+		this.stack = new com_haxepunk_Sfx("audio/stack.wav");
 	}
 	,fillOrEmpty: function(fill) {
-		if(fill) this.cansOfSoup += 1; else this.cansOfSoup -= 1;
+		if(fill) {
+			this.stack.play();
+			this.cansOfSoup += 1;
+		} else this.cansOfSoup -= 1;
 	}
 	,newMap: function() {
 		var _g = 0;
@@ -4843,8 +4870,12 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 			var _g1 = 0;
 			while(_g1 < 10) {
 				var j = _g1++;
-				var filled = Std["int"](Math.round(Math.random()));
+				var count;
+				if(i == 0) count = i; else count = i * 10;
+				count += j;
+				var filled = Std["int"](Math.abs(Math.round(Math.random() - 0.3)));
 				var newSlot = new Slot(j * this.xOff,i * this.yOff);
+				this.cupboard[count] = newSlot;
 				if(filled == 0) newSlot.filled = false; else {
 					newSlot.filled = true;
 					this.cansOfSoup += 1;
@@ -4853,17 +4884,65 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 				newSlot.width = this.xOff | 0;
 				newSlot.scale = this.scale;
 				this.add(newSlot);
-				this.cupboard[i + j * i] = newSlot;
 			}
+		}
+	}
+	,shouldSteal: function() {
+		var selector = Math.floor(Math.random() * 40);
+		if(Math.random() > 0.98) this.steal(selector);
+	}
+	,steal: function(selector) {
+		var slot;
+		slot = js_Boot.__cast(this.cupboard[selector] , Slot);
+		if(slot.filled) {
+			this.fillOrEmpty(false);
+			slot.filled = false;
+			this.geethanks.play();
 		}
 	}
 	,update: function() {
 		com_haxepunk_Scene.prototype.update.call(this);
+		this.shouldSteal();
 		this.soupBar.set_scaledWidth(this.cansOfSoup / 40 * 100 * this.scale | 0);
-		this.time -= com_haxepunk_HXP.elapsed;
+		if(this.time > 0) this.time -= com_haxepunk_HXP.elapsed; else this.time = 0;
 		this.timeText.set_text(Std.string(Math.round(this.time * 100) / 100.0));
-		if(this.time < 0) {
-			if(this.cansOfSoup == 40) haxe_Log.trace("hoozaaah",{ fileName : "MainScene.hx", lineNumber : 77, className : "MainScene", methodName : "update"}); else haxe_Log.trace(":(",{ fileName : "MainScene.hx", lineNumber : 79, className : "MainScene", methodName : "update"});
+		if(this.time <= 0 && !this.done) {
+			this.doneTime += com_haxepunk_HXP.elapsed;
+			if(this.cansOfSoup == 40) {
+				this.done = true;
+				var wonText = new com_haxepunk_graphics_Text("Well Done",null,null,null,null,{ color : 218103807});
+				wonText.set_size(40 * this.scale | 0);
+				wonText._scale = this.scale;
+				this.addGraphic(wonText,null,com_haxepunk_HXP.screen.width / 2 - 200 * this.scale,com_haxepunk_HXP.screen.height / 2);
+				var jean = new com_haxepunk_graphics_Spritemap(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+					var $r;
+					var e = com_haxepunk_ds_Either.Right(new com_haxepunk_graphics_atlas_TileAtlas((function($this) {
+						var $r;
+						var data = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("graphics/man.png",true);
+						$r = data;
+						return $r;
+					}($this))));
+					$r = e;
+					return $r;
+				}(this)):(function($this) {
+					var $r;
+					var e1 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("graphics/man.png"));
+					$r = e1;
+					return $r;
+				}(this)),48,56);
+				jean._scale = this.scale * 3;
+				jean.smooth = false;
+				jean.add("walking",[0,1,2,3],12);
+				jean.play("walking");
+				this.addGraphic(jean,null,340 * this.scale,320 * this.scale);
+			} else {
+				this.done = true;
+				var wonText1 = new com_haxepunk_graphics_Text(":( Next time come prepared",null,null,null,null,{ color : 218103807});
+				wonText1.set_size(40 * this.scale | 0);
+				wonText1._scale = this.scale;
+				this.addGraphic(wonText1,null,20 * this.scale,com_haxepunk_HXP.screen.height / 2);
+			}
+			if(this.doneTime > 3) com_haxepunk_HXP.set_scene(new IntroScene());
 		}
 	}
 	,__class__: MainScene
@@ -4974,6 +5053,7 @@ Slot.prototype = $extend(com_haxepunk_Entity.prototype,{
 	,scale: null
 	,empty: null
 	,full: null
+	,done: null
 	,main: null
 	,added: function() {
 		com_haxepunk_Entity.prototype.added.call(this);
@@ -4983,13 +5063,14 @@ Slot.prototype = $extend(com_haxepunk_Entity.prototype,{
 	}
 	,handleMouse: function() {
 		var mouseEntity = new com_haxepunk_Entity(com_haxepunk_utils_Input.get_mouseX(),com_haxepunk_utils_Input.get_mouseY());
-		if(this.collideWith(mouseEntity,this.followCamera?this.x + com_haxepunk_HXP.camera.x:this.x,this.followCamera?this.y + com_haxepunk_HXP.camera.y:this.y) == mouseEntity) {
+		if(this.collideWith(mouseEntity,this.followCamera?this.x + com_haxepunk_HXP.camera.x:this.x,this.followCamera?this.y + com_haxepunk_HXP.camera.y:this.y) == mouseEntity && !this.done) {
 			this.filled = !this.filled;
 			this.main.fillOrEmpty(this.filled);
 		}
 	}
 	,update: function() {
 		com_haxepunk_Entity.prototype.update.call(this);
+		this.done = (js_Boot.__cast(com_haxepunk_HXP.engine , Main)).done;
 		if(com_haxepunk_utils_Input.mousePressed) this.handleMouse();
 		if(this.filled) this.set_graphic(this.full); else this.set_graphic(this.empty);
 	}
@@ -5630,6 +5711,210 @@ com_haxepunk_Screen.prototype = {
 	,_shakeY: null
 	,__class__: com_haxepunk_Screen
 	,__properties__: {get_mouseY:"get_mouseY",get_mouseX:"get_mouseX",set_smoothing:"set_smoothing",get_smoothing:"get_smoothing",set_angle:"set_angle",get_angle:"get_angle",set_scale:"set_scale",set_scaleY:"set_scaleY",set_scaleX:"set_scaleX",set_originY:"set_originY",set_originX:"set_originX",set_y:"set_y",set_x:"set_x",set_color:"set_color",get_color:"get_color"}
+};
+var com_haxepunk_Sfx = function(source,complete) {
+	this._position = 0;
+	this._pan = 0;
+	this._volume = 1;
+	this._transform = new openfl_media_SoundTransform();
+	this._volume = 1;
+	this._pan = 0;
+	this._position = 0;
+	this._type = "";
+	if(source == null) throw "Invalid source Sound.";
+	if(typeof(source) == "string") {
+		this._sound = openfl_Assets.getSound(source);
+		var key = source;
+		com_haxepunk_Sfx._sounds.set(key,this._sound);
+	} else {
+		var className = Type.getClassName(Type.getClass(source));
+		this._sound = com_haxepunk_Sfx._sounds.get(className);
+		if(this._sound == null) {
+			this._sound = source;
+			var value = source;
+			com_haxepunk_Sfx._sounds.set(className,value);
+		}
+	}
+	this.complete = complete;
+};
+$hxClasses["com.haxepunk.Sfx"] = com_haxepunk_Sfx;
+com_haxepunk_Sfx.__name__ = ["com","haxepunk","Sfx"];
+com_haxepunk_Sfx.getPan = function(type) {
+	if(com_haxepunk_Sfx._typeTransforms.exists(type)) {
+		var transform = com_haxepunk_Sfx._typeTransforms.get(type);
+		if(transform != null) return transform.pan; else return 0;
+	}
+	return 0;
+};
+com_haxepunk_Sfx.getVolume = function(type) {
+	if(com_haxepunk_Sfx._typeTransforms.exists(type)) {
+		var transform = com_haxepunk_Sfx._typeTransforms.get(type);
+		if(transform != null) return transform.volume; else return 1;
+	}
+	return 1;
+};
+com_haxepunk_Sfx.setPan = function(type,pan) {
+	var transform = com_haxepunk_Sfx._typeTransforms.get(type);
+	if(transform == null) {
+		transform = new openfl_media_SoundTransform();
+		com_haxepunk_Sfx._typeTransforms.set(type,transform);
+	}
+	transform.pan = com_haxepunk_HXP.clamp(pan,-1,1);
+	if(com_haxepunk_Sfx._typePlaying.exists(type)) {
+		var _g = 0;
+		var _g1 = com_haxepunk_Sfx._typePlaying.get(type);
+		while(_g < _g1.length) {
+			var sfx = _g1[_g];
+			++_g;
+			sfx.set_pan(sfx.get_pan());
+		}
+	}
+};
+com_haxepunk_Sfx.setVolume = function(type,volume) {
+	var transform = com_haxepunk_Sfx._typeTransforms.get(type);
+	if(transform == null) {
+		transform = new openfl_media_SoundTransform();
+		com_haxepunk_Sfx._typeTransforms.set(type,transform);
+	}
+	if(volume < 0) transform.volume = 0; else transform.volume = volume;
+	if(com_haxepunk_Sfx._typePlaying.exists(type)) {
+		var _g = 0;
+		var _g1 = com_haxepunk_Sfx._typePlaying.get(type);
+		while(_g < _g1.length) {
+			var sfx = _g1[_g];
+			++_g;
+			sfx.set_volume(sfx.get_volume());
+		}
+	}
+};
+com_haxepunk_Sfx.prototype = {
+	complete: null
+	,play: function(volume,pan,loop) {
+		if(loop == null) loop = false;
+		if(pan == null) pan = 0;
+		if(volume == null) volume = 1;
+		if(this._sound == null) return;
+		if(this._channel != null) this.stop();
+		this._pan = com_haxepunk_HXP.clamp(pan,-1,1);
+		if(volume < 0) this._volume = 0; else this._volume = volume;
+		this._filteredPan = com_haxepunk_HXP.clamp(this._pan + com_haxepunk_Sfx.getPan(this._type),-1,1);
+		this._filteredVol = Math.max(0,this._volume * com_haxepunk_Sfx.getVolume(this._type));
+		this._transform.pan = this._filteredPan;
+		this._transform.volume = this._filteredVol;
+		this._channel = this._sound.play(0,loop?-1:0,this._transform);
+		if(this._channel != null) {
+			this.addPlaying();
+			this._channel.addEventListener(openfl_events_Event.SOUND_COMPLETE,$bind(this,this.onComplete));
+		}
+		this._looping = loop;
+		this._position = 0;
+	}
+	,loop: function(vol,pan) {
+		if(pan == null) pan = 0;
+		if(vol == null) vol = 1;
+		this.play(vol,pan,true);
+	}
+	,stop: function() {
+		if(!(this._channel != null)) return false;
+		this.removePlaying();
+		this._position = this._channel.get_position();
+		this._channel.removeEventListener(openfl_events_Event.SOUND_COMPLETE,$bind(this,this.onComplete));
+		this._channel.stop();
+		this._channel = null;
+		return true;
+	}
+	,resume: function() {
+		this._channel = this._sound.play(this._position,this._looping?-1:0,this._transform);
+		if(this._channel != null) {
+			this.addPlaying();
+			this._channel.addEventListener(openfl_events_Event.SOUND_COMPLETE,$bind(this,this.onComplete));
+		}
+		this._position = 0;
+	}
+	,onComplete: function(e) {
+		if(this._looping) this.loop(this._volume,this._pan); else this.stop();
+		this._position = 0;
+		if(this.complete != null) this.complete();
+	}
+	,addPlaying: function() {
+		var list;
+		if(!com_haxepunk_Sfx._typePlaying.exists(this._type)) {
+			list = new Array();
+			com_haxepunk_Sfx._typePlaying.set(this._type,list);
+		} else list = com_haxepunk_Sfx._typePlaying.get(this._type);
+		list.push(this);
+	}
+	,removePlaying: function() {
+		if(com_haxepunk_Sfx._typePlaying.exists(this._type)) {
+			var _this = com_haxepunk_Sfx._typePlaying.get(this._type);
+			HxOverrides.remove(_this,this);
+		}
+	}
+	,get_volume: function() {
+		return this._volume;
+	}
+	,set_volume: function(value) {
+		if(value < 0) value = 0;
+		if(this._channel == null || this._volume == value) return value;
+		this._volume = value;
+		var filteredVol = value * com_haxepunk_Sfx.getVolume(this._type);
+		if(filteredVol < 0) filteredVol = 0;
+		if(this._filteredVol == filteredVol) return value;
+		this._filteredVol = this._transform.volume = filteredVol;
+		this._channel.set_soundTransform(this._transform);
+		return this._volume;
+	}
+	,get_pan: function() {
+		return this._pan;
+	}
+	,set_pan: function(value) {
+		value = com_haxepunk_HXP.clamp(value,-1,1);
+		if(this._channel == null || this._pan == value) return value;
+		var filteredPan = com_haxepunk_HXP.clamp(value + com_haxepunk_Sfx.getPan(this._type),-1,1);
+		if(this._filteredPan == filteredPan) return value;
+		this._pan = value;
+		this._filteredPan = this._transform.pan = filteredPan;
+		this._channel.set_soundTransform(this._transform);
+		return this._pan;
+	}
+	,get_type: function() {
+		return this._type;
+	}
+	,set_type: function(value) {
+		if(this._type == value) return value;
+		if(this._channel != null) {
+			this.removePlaying();
+			this._type = value;
+			this.addPlaying();
+			this.set_pan(this.get_pan());
+			this.set_volume(this.get_volume());
+		} else this._type = value;
+		return value;
+	}
+	,playing: null
+	,get_playing: function() {
+		return this._channel != null;
+	}
+	,position: null
+	,get_position: function() {
+		return (this._channel != null?this._channel.get_position():this._position) / 1000;
+	}
+	,length: null
+	,get_length: function() {
+		return this._sound.length / 1000;
+	}
+	,_type: null
+	,_volume: null
+	,_pan: null
+	,_filteredVol: null
+	,_filteredPan: null
+	,_sound: null
+	,_channel: null
+	,_transform: null
+	,_position: null
+	,_looping: null
+	,__class__: com_haxepunk_Sfx
+	,__properties__: {get_length:"get_length",get_position:"get_position",get_playing:"get_playing",set_type:"set_type",get_type:"get_type",set_pan:"set_pan",get_pan:"get_pan",set_volume:"set_volume",get_volume:"get_volume"}
 };
 var com_haxepunk_TweenType = $hxClasses["com.haxepunk.TweenType"] = { __ename__ : true, __constructs__ : ["Persist","Looping","OneShot"] };
 com_haxepunk_TweenType.Persist = ["Persist",0];
@@ -27412,6 +27697,9 @@ com_haxepunk_HXP.rect = new openfl_geom_Rectangle();
 com_haxepunk_HXP.matrix = new openfl_geom_Matrix();
 com_haxepunk_HXP.sprite = new openfl_display_Sprite();
 com_haxepunk_Entity._EMPTY = new com_haxepunk_Entity();
+com_haxepunk_Sfx._sounds = new haxe_ds_StringMap();
+com_haxepunk_Sfx._typePlaying = new haxe_ds_StringMap();
+com_haxepunk_Sfx._typeTransforms = new haxe_ds_StringMap();
 com_haxepunk_debug_Console.BIG_WIDTH_THRESHOLD = 420;
 com_haxepunk_graphics_Image._flips = new haxe_ds_ObjectMap();
 com_haxepunk_graphics_Text.tag_re = new EReg("<([^>]+)>([^(?:</)]+)</[^>]+>","g");
