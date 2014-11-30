@@ -4864,8 +4864,8 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 		this.soupBar = com_haxepunk_graphics_Image.createRect(100 * this.scale | 0,20 * this.scale | 0,12797224);
 		this.addGraphic(outerSoupBar,null,10 * this.scale,10 * this.scale);
 		this.addGraphic(this.soupBar,null,13 * this.scale,13 * this.scale);
-		this.geethanks = new com_haxepunk_Sfx("audio/geethanks.mp3");
-		this.stack = new com_haxepunk_Sfx("audio/stack.mp3");
+		this.geethanks = new com_haxepunk_Sfx("audio/geethanks.wav");
+		this.stack = new com_haxepunk_Sfx("audio/stack.wav");
 	}
 	,fillOrEmpty: function(fill) {
 		if(fill) {
