@@ -4912,7 +4912,7 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 	}
 	,update: function() {
 		com_haxepunk_Scene.prototype.update.call(this);
-		this.shouldSteal();
+		if(!this.done) this.shouldSteal();
 		this.soupBar.set_scaledWidth(this.cansOfSoup / 40 * 100 * this.scale | 0);
 		if(this.time > 0) this.time -= com_haxepunk_HXP.elapsed; else this.time = 0;
 		this.timeText.set_text(Std.string(Math.round(this.time * 100) / 100.0));
