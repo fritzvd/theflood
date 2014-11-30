@@ -50,6 +50,12 @@ class IntroScene extends Scene
         HXP.scene = new FloodScene(); 
     }
 
+#if mobile
+    private function handleTouch(touch:com.haxepunk.utils.Touch) {
+        nextScene();
+    }
+#end
+    
     public override function update () {
         super.update();
         
@@ -64,7 +70,7 @@ class IntroScene extends Scene
             nextScene();
         }
         #if mobile
-        Input.touchPoints(nextScene);
+        Input.touchPoints(handleTouch);
         #else
         if (Input.mousePressed ||
             Input.pressed(Key.ANY)) {

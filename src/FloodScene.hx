@@ -61,6 +61,15 @@ class FloodScene extends Scene
         HXP.scene = new MainScene(); 
     }
 
+#if mobile
+    private function handleTouch(touch:com.haxepunk.utils.Touch) {
+        if (touch.pressed) {
+            nextScene();
+        }
+    }
+#end
+
+
     public override function update () {
         super.update();
         
@@ -77,7 +86,7 @@ class FloodScene extends Scene
         if (time > 3) {
        }
         #if mobile
-        Input.touchPoints(nextScene);
+        Input.touchPoints(handleTouch);
         #else
         if (Input.mousePressed ||
             Input.pressed(Key.ANY)) {
