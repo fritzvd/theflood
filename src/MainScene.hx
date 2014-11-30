@@ -43,8 +43,8 @@ class MainScene extends Scene
         addGraphic(outerSoupBar, 10 * scale, 10 * scale);
         addGraphic(soupBar, 13 * scale, 13 * scale);
  
-        geethanks = new Sfx("audio/geethanks.wav");
-        stack = new Sfx("audio/stack.wav");
+        geethanks = new Sfx("audio/geethanks.mp3");
+        stack = new Sfx("audio/stack.mp3");
 	}
 
     public function fillOrEmpty(fill) {
