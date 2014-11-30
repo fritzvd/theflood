@@ -9,7 +9,7 @@ class Main extends Engine
 #if debug
 		HXP.console.enable();
 #end
-		HXP.scene = new MainScene();
+		HXP.scene = new IntroScene();
 	}
 
 	public static function main() { new Main(); }
