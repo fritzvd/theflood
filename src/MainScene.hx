@@ -9,7 +9,11 @@ import Slot;
 
 class MainScene extends Scene
 {
+#if !mobile
     private var time:Float = 20;
+#else
+    private var time:Float = 15;
+#end
     private var doneTime:Float = 0;
     private var cupboard:Array<Slot>;
     private var scale:Float;
