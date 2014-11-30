@@ -105,6 +105,8 @@ class MainScene extends Scene
 
         if (!done) {
             shouldSteal();
+        } else {
+            doneTime += HXP.elapsed;
         }
 
         if (doneTime > 3) {
@@ -118,7 +120,6 @@ class MainScene extends Scene
         }
         timeText.text = Std.string(Math.round(time * 100) / 100.0);
         if (time <= 0 && !done) {
-            doneTime += HXP.elapsed;
             if (cansOfSoup == 40) {
 
                 done = true;
