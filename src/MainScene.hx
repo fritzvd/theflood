@@ -103,7 +103,9 @@ class MainScene extends Scene
     public override function update () {
         super.update();
 
-        shouldSteal();
+        if (!done) {
+            shouldSteal();
+        }
 
         soupBar.scaledWidth = Std.int(cansOfSoup / 40 * 100 * scale);
         if (time > 0) {
