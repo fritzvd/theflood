@@ -1,3 +1,4 @@
+import com.haxepunk.HXP;
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.utils.Input;
@@ -10,12 +11,14 @@ class Slot extends Entity
 
     private var empty:Image;
     private var full:Image;
+    private var done:Bool;
     private var main:MainScene;
     
     public function new (x, y) {
         super(x, y);
         empty = new Image('graphics/empty.png');
         full = new Image('graphics/full.png');
+
 
         filled = false;
         this.graphic = empty;
@@ -32,7 +35,7 @@ class Slot extends Entity
     private function handleTouch(touch:Touch) {
         var touchEntity = new Entity(touch.x, touch.y);
         if (this.collideWith(touchEntity, this.x, this.y) == touchEntity &&
-            touch.pressed) {
+            touch.pressed && !done) {
             this.filled = !this.filled;
             main.fillOrEmpty(this.filled);
         }
@@ -42,7 +45,8 @@ class Slot extends Entity
     #if !mobile
     private function handleMouse () {
         var mouseEntity = new Entity(Input.mouseX, Input.mouseY);
-        if (this.collideWith(mouseEntity, this.x, this.y) == mouseEntity) {
+        if (this.collideWith(mouseEntity, this.x, this.y) == mouseEntity &&
+            !done) {
             this.filled = !this.filled;
             main.fillOrEmpty(this.filled);
         }
@@ -51,6 +55,7 @@ class Slot extends Entity
 
     public override function update() {
         super.update();
+        done = cast(HXP.engine, Main).done;
 
     #if mobile
         Input.touchPoints(handleTouch);
