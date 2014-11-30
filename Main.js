@@ -57,7 +57,11 @@ ApplicationMain.create = function() {
 	types.push("IMAGE");
 	urls.push("graphics/empty.png");
 	types.push("IMAGE");
+	urls.push("audio/stack.ogg");
+	types.push("SOUND");
 	urls.push("audio/geethanks.wav");
+	types.push("SOUND");
+	urls.push("audio/geethanks.ogg");
 	types.push("SOUND");
 	urls.push("audio/stack.wav");
 	types.push("SOUND");
@@ -1383,7 +1387,13 @@ var DefaultAssetLibrary = function() {
 	id = "graphics/empty.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
+	id = "audio/stack.ogg";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
 	id = "audio/geethanks.wav";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
+	id = "audio/geethanks.ogg";
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
 	id = "audio/stack.wav";
@@ -4854,8 +4864,8 @@ MainScene.prototype = $extend(com_haxepunk_Scene.prototype,{
 		this.soupBar = com_haxepunk_graphics_Image.createRect(100 * this.scale | 0,20 * this.scale | 0,12797224);
 		this.addGraphic(outerSoupBar,null,10 * this.scale,10 * this.scale);
 		this.addGraphic(this.soupBar,null,13 * this.scale,13 * this.scale);
-		this.geethanks = new com_haxepunk_Sfx("audio/geethanks.wav");
-		this.stack = new com_haxepunk_Sfx("audio/stack.wav");
+		this.geethanks = new com_haxepunk_Sfx("audio/geethanks.mp3");
+		this.stack = new com_haxepunk_Sfx("audio/stack.mp3");
 	}
 	,fillOrEmpty: function(fill) {
 		if(fill) {
